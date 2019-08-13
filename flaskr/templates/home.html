@@ -1,0 +1,52 @@
+<!doctype html>
+<head>
+  <meta charset="utf-8">
+  <title>求臻医学</title>
+  <link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <script src="https://cdn.staticfile.org/jquery/3.2.1/jquery.min.js"></script>
+  <script src="https://cdn.staticfile.org/popper.js/1.12.5/umd/popper.min.js"></script>
+  <script src="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/js/bootstrap.min.js"></script>
+</head>
+<div class="container">
+    <div class="jumbotron text-left">
+        <h1 class="display-4">Hello, world!</h1>
+        <p  class="lead">探索科技创新 致力医学求臻</p>
+    </div>
+
+    <h3>基因经典转录本查询</h3><br>
+        <form method="post" action="/knownCanonical"  class="form-inline"  target="_blank">
+            gene name:<input name="Genename" type="text" placeholder="e.g:TP53">
+             <button type="submit" class="btn btn-primary mb-2">Submit</button>
+        </form><br>
+
+    <h3>hgvs转录本变异注释解析</h3><br>
+        <form method="post" action="/hgvs" target="_blank">
+            genomic variant:<input name="Var" type="text" placeholder="e.g:NM_004448.3:c.2310_2311insGCATACGTGATG" class="col-sm-7">
+            <button type="submit" class="btn btn-primary mb-2">Submit</button>
+        </form><br>
+
+    <h3>cosmicID</h3><br>
+            <form method="post"  target="_blank">
+            input cosmicID:<input name="cosmicID" type="text" placeholder="e.g:4413770" class="col-sm-7">
+                <button type="submit" class="btn btn-primary mb-2">Submit</button>
+            </form><br>
+    <h3>变异位点注释</h3><br>
+        <form method="post" target="_blank" action="/var_anno">
+            Chr:<input name=Chr type="text" placeholder="chr1" class="col-sm-1">
+            Pos:<input name=Pos type="text" class="col-sm-3">
+            REF:<input name=Ref type="text" class="col-sm-3">
+            ALT:<input name=Alt type="text" class="col-sm-3">
+            <br><br>
+            <button type="submit" class="btn btn-primary mb-2">Submit</button>
+        </form><br>
+
+
+
+    <address>
+        Written by <a href="mailto:yucaifan@chosenmedtech.com">fanyucai</a>.<br>
+        北京市经济技术开发区经海四路156号经海产业园C3栋<br>
+        010-56380035 | 010-59544150<br>
+    </address>
+
+    <br><br>
+</div>

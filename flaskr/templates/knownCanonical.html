@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block body %}
+{% if Genename %}
+    <dt>
+        <h3>{{Genename}} known Canonical as follows::</h3>
+    </dt>
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">Transcript</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% set entrys=trans.split("\t") %}
+            {% for entry in entrys %}
+                {% if entry != Genename %}
+                    <tr>
+                        <td>{{entry}}</td>
+                    </tr>
+                {% endif %}
+            {%- endfor %}
+        </tbody>
+    </table>
+{% endif %}
+{% endblock %}

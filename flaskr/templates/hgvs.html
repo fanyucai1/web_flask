@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+
+{% block body %}
+
+{% if Var %}
+    <div class="jumbotron text-left">
+        <h3>{{Var}}</h3><p>hgvs-format as follows:</p>
+        <p class="lead">{{Nr}}</p>
+        <p class="lead">{{Nt}}</p>
+    </div>
+{% endif %}
+{% endblock %}
