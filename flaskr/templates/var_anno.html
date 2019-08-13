@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block body %}
+{% if Chr and Pos and Ref and Alt %}
+<div class="table-responsive">
+    <table class="table table-bordered table-striped">
+        <thead>
+        <tr>
+            {% for i in Name %}
+            <th> {{i}} </th>
+            {% endfor %}
+        </tr>
+        </thead>
+        <tbody>
+            <tr>
+                {% for i in Anno %}
+                <td>{{i}}</td>
+                {% endfor %}
+            </tr>
+        </tbody>
+    </table>
+</div>
+{% endif %}
+{% endblock %}

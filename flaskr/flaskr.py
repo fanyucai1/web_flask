@@ -9,7 +9,6 @@ import subprocess
 from flask import Flask, request, session, g, redirect, url_for, abort, render_template,flash,jsonify,make_response
 from flask import redirect
 
-
 trans="knownCanonical.final.tsv"
 infile=open(trans,"r")
 dict={}
@@ -51,6 +50,8 @@ def var_anno():
     pos=request.form['Pos']
     ref=request.form['Ref']
     alt=request.form['Alt']
+    name,anno=core.var_anno.run(chr,pos,ref,alt)
+    return render_template('var_anno.html',Chr=chr,Pos=pos,Ref=ref,Alt=alt,Name=name,Anno=anno)
 
 if __name__ == '__main__':
     #app.run(debug=True,host='192.168.1.120',port=100)
