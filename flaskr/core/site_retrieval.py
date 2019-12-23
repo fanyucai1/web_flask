@@ -13,53 +13,72 @@ class Myconf(configparser.ConfigParser):
 def run(chr,pos,configfile="/home/fanyucai/config/config.ini"):
     config = Myconf()
     config.read(configfile)
-    gtf=config.get('database','gencode_gtf')
+    gtf=config.get('database','hg19_gtf')
     bedtools=config.get('software','bedtools2.28.0')
     hg19=config.get('database','hg19_ref')
     RefSeq=config.get('database','RefSeq_meta')
     infile=open(gtf,"r")
-    gene_name,transcript,chain,exon=[],[],[],""
+    ##################################
+    gene_name,transcript,exon="","",""
     for line in infile:
         line=line.strip()
         if not line.startswith("#"):
             array=line.split("\t")
-            if array[2] == "transcript" and array[0] == chr and pos >= int(array[3]) and pos <= int(array[4]):
+            if array[2] == "exon" and array[0] == chr and pos > int(array[3]) and pos < int(array[4]):
                 p = re.compile(r'gene_name \"(\S+)\"')
-                gene_name.append(p.findall(line)[0])
+                gene_name=p.findall(line)[0]
                 p = re.compile(r'transcript_id \"(\S+)\"')
-                transcript.append(p.findall(line)[0])
-                chain.append(array[6])
+                transcript=p.findall(line)[0]
+                p = re.compile(r'exon_number \"(\S+)\";')
+                exon_number = p.findall(line)[0]
+                print("gene name:%s transcript_name:%s exon_number:%s %s" % (gene_name, transcript, exon_number, array[6]))
+            if array[2] == "exon" and array[0] == chr:
+                if pos == int(array[3]) or pos == int(array[4]):
+                    p = re.compile(r'gene_name \"(\S+)\"')
+                    gene_name = p.findall(line)[0]
+                    p = re.compile(r'transcript_id \"(\S+)\"')
+                    transcript = p.findall(line)[0]
+                    p = re.compile(r'exon_number \"(\S+)\";')
+                    exon_number = p.findall(line)[0]
+                    print("gene name:%s transcript_name:%s exon_number:%s %s" % (gene_name, transcript, exon_number, array[6]))
+    infile.close()
+    ##############################
+    exon=""
+    infile = open(gtf, "r")
+    for line in infile:
+        line=line.strip()
+        if not line.startswith("#"):
+            array = line.split("\t")
             if array[2]=="exon" and array[0]==chr:
                 if pos >int(array[3]) and pos <int(array[4]):
-                    p = re.compile(r'exon_number (\d+);')
+                    p = re.compile(r'exon_number \"(\S+)\";')
                     exon_number = p.findall(line)
                     exon=""
                     print("gene name:%s transcript_name:%s exon_number:%s %s" % (gene_name[0], transcript[0], exon_number[0],array[6]))
-                elif pos ==int(array[3]) or pos ==int(array[4]):
-                    p = re.compile(r'exon_number (\d+);')
+                if pos ==int(array[3]) or pos ==int(array[4]):
+                    p = re.compile(r'exon_number \"(\S+)\";')
                     exon_number = p.findall(line)
                     exon = ""
                     print("gene name:%s transcript_name:%s exon_number:%s %s" % (gene_name[0], transcript[0], exon_number[0], array[6]))
-                else:
-                    p = re.compile(r'transcript_id \"(\S+)\"')
-                    name=p.findall(line)
-                    if name and name[0] in transcript:
-                        if array[6]=="+":
-                            if int(pos) > int(array[4]):
-                                p = re.compile(r'exon_number (\d+);')
-                                exon_number = p.findall(line)
-                                exon=exon_number[0]
-                            if int(pos) < int(array[3]) and exon!="":
-                                print("gene name:%s transcript_name:%s intron_number:%s %s"%(gene_name[-1],name[0], exon,array[6]))
-                                exon=""
-                        else:
-                            if int(pos) < int(array[3]):
-                                p = re.compile(r'exon_number (\d+);')
-                                exon_number = p.findall(line)
-                                exon=exon_number[0]
-                            if int(pos) > int(array[4]) and exon!="":
-                                print("gene name:%s transcript_name:%s intron_number:%s %s"%(gene_name[-1],name[0], exon,array[6]))
-                                exon=""
+                p = re.compile(r'transcript_id \"(\S+)\"')
+                name=p.findall(line)
+                if name and name[0] in transcript:
+                    if array[6]=="+":
+                        if int(pos) > int(array[4]):
+                            p = re.compile(r'exon_number \"(\S+)\";')
+                            exon_number = p.findall(line)
+                            exon=exon_number[0]
+                        if int(pos) < int(array[3]) and exon!="":
+                            print("gene name:%s transcript_name:%s intron_number:%s %s"%(gene_name[-1],name[0], exon,array[6]))
+                            exon=""
+                    else:
+                        if int(pos) < int(array[3]):
+                            p = re.compile(r'exon_number \"(\S+)\";')
+                            exon_number = p.findall(line)
+                            exon=exon_number[0]
+                        if int(pos) > int(array[4]) and exon!="":
+                            print("gene name:%s transcript_name:%s intron_number:%s %s"%(gene_name[-1],name[0], exon,array[6]))
+                            exon=""
     unique_filename = str(uuid.uuid4())
     tmp = open("%s.bed"%unique_filename, "w")
     right=pos+20
@@ -80,4 +99,4 @@ def run(chr,pos,configfile="/home/fanyucai/config/config.ini"):
 
 
 if __name__=="__main__":
-    run("chr1",29535)
+    run("chr1",14362)
