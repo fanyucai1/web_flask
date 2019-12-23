@@ -16,16 +16,16 @@ def run(chr,pos,configfile="/home/fanyucai/config/config.ini"):
     gtf=config.get('database','gencode_gtf')
     bedtools=config.get('software','bedtools2.28.0')
     hg19=config.get('database','hg19_ref')
+    RefSeq=config.get('database','RefSeq_meta')
     infile=open(gtf,"r")
     gene_name,transcript,chain,exon=[],[],[],""
     for line in infile:
         line=line.strip()
         if not line.startswith("#"):
             array=line.split("\t")
-            if array[2] == "gene" and array[0] == chr and pos >= int(array[3]) and pos <= int(array[4]):
+            if array[2] == "transcript" and array[0] == chr and pos >= int(array[3]) and pos <= int(array[4]):
                 p = re.compile(r'gene_name \"(\S+)\"')
                 gene_name.append(p.findall(line)[0])
-            if array[2] == "transcript" and array[0] == chr and pos >= int(array[3]) and pos <= int(array[4]):
                 p = re.compile(r'transcript_id \"(\S+)\"')
                 transcript.append(p.findall(line)[0])
                 chain.append(array[6])
@@ -63,7 +63,7 @@ def run(chr,pos,configfile="/home/fanyucai/config/config.ini"):
     unique_filename = str(uuid.uuid4())
     tmp = open("%s.bed"%unique_filename, "w")
     right=pos+20
-    left=pos-20
+    left=pos-20-1#bed的文件是左闭右开
     tmp.write("%s\t%s\t%s\n"%(chr,left,right))
     tmp.close()
     cmd='%s getfasta -fi %s -bed %s.bed -fo %s.fasta && rm %s.bed'%(bedtools,hg19,unique_filename,unique_filename,unique_filename)
@@ -72,9 +72,12 @@ def run(chr,pos,configfile="/home/fanyucai/config/config.ini"):
     outstring=""
     for line in infile:
         if not line.startswith(">"):
-            outstring=line[0:19].lower()+line[20].upper()+line[21:].lower()
+            print(line)
+            outstring=line[0:20].lower()+line[20:21].upper()+line[21:].lower()
     infile.close()
     subprocess.check_call('rm %s.fasta'%(unique_filename),shell=True)
     print(outstring)
+
+
 if __name__=="__main__":
     run("chr1",29535)
