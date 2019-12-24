@@ -13,38 +13,59 @@ class Myconf(configparser.ConfigParser):
 def run(chr,pos,configfile="/home/fanyucai/config/config.ini"):
     config = Myconf()
     config.read(configfile)
+    unique_filename = str(uuid.uuid4())
     gtf=config.get('database','hg19_gtf')
     bedtools=config.get('software','bedtools2.28.0')
     hg19=config.get('database','hg19_ref')
-    RefSeq=config.get('database','RefSeq_meta')
+    ##################################
+    result_gene,result_trans,result_detail,result_chain=[],[],[],[]
     infile=open(gtf,"r")
     ##################################
-    gene_fina,transcript_fina,exon="","",""
+    geneID,transcriptID=[],[]
     for line in infile:
         line=line.strip()
         if not line.startswith("#"):
             array=line.split("\t")
-            if array[2] == "exon" and array[0] == chr:
+            p = re.compile(r'gene_name \"(\S+)\"')
+            gene_name = p.findall(line)[0]
+            p = re.compile(r'transcript_id \"(\S+)\"')
+            transcript = p.findall(line)[0]
+            if chr==array[0] and array[2] == "transcript" and pos >= int(array[3]) and pos <= int(array[4]):
+                geneID.append(gene_name)
+                transcriptID.append(transcript)
+    infile.close()
+    ###################################
+    gene_fina, transcript_fina, exon = "", "", ""
+    infile = open(gtf, "r")
+    for line in infile:
+        line=line.strip()
+        if not line.startswith("#"):
+            array=line.split("\t")
+            if chr == array[0] and array[2] == "exon":
                 p = re.compile(r'gene_name \"(\S+)\"')
-                gene_name=p.findall(line)[0]
+                gene_name = p.findall(line)[0]
                 p = re.compile(r'transcript_id \"(\S+)\"')
-                transcript=p.findall(line)[0]
+                transcript = p.findall(line)[0]
                 p = re.compile(r'exon_number \"(\S+)\";')
                 exon_number = p.findall(line)[0]
-                if pos > int(array[3]) and pos < int(array[4]):
-                    print("gene name:%s transcript_name:%s exon_number:%s %s" % (gene_name, transcript, exon_number, array[6]))
-                if pos == int(array[3]) or pos == int(array[4]):
-                    print("gene name:%s transcript_name:%s exon_number:%s %s" % (gene_name, transcript, exon_number, array[6]))
-                if int(pos) > int(array[4]):
-                    exon = exon_number[0]
-                    gene_fina=gene_name
-                    transcript_fina=transcript
-                if int(pos) < int(array[3]) and exon != "" and gene_fina==gene_name and transcript_fina==gene_name:
-                    print("gene name:%s transcript_name:%s intron_number:%s %s" % (gene_name, transcript, exon, array[6]))
-                    exon=""
+                if transcript in transcriptID:
+                    if pos >= int(array[3]) and pos <= int(array[4]):
+                        result_gene.append(gene_name)
+                        result_trans.append(transcript)
+                        result_detail.append("exon_number:%s"%(exon_number))
+                        result_chain.append(array[6])
+                    if int(pos) > int(array[4]):
+                        exon = exon_number[0]
+                        gene_fina=gene_name
+                        transcript_fina=transcript
+                    if int(pos) < int(array[3]) and exon != "" and gene_fina==gene_name and transcript_fina==transcript:
+                        result_gene.append(gene_name)
+                        result_trans.append(transcript)
+                        result_detail.append("intron_number:%s" % (exon_number))
+                        result_chain.append(array[6])
+                        exon=""
     infile.close()
     ##############################
-    unique_filename = str(uuid.uuid4())
     tmp = open("%s.bed"%unique_filename, "w")
     right=pos+20
     left=pos-20-1#bed的文件是左闭右开
@@ -60,8 +81,9 @@ def run(chr,pos,configfile="/home/fanyucai/config/config.ini"):
             outstring=line[0:20].lower()+line[20:21].upper()+line[21:].lower()
     infile.close()
     subprocess.check_call('rm %s.fasta'%(unique_filename),shell=True)
-    print(outstring)
-
+    return (result_gene,result_trans,result_detail,result_chain,outstring)
 
 if __name__=="__main__":
-    run("chr1",14362)
+    chr=sys.argv[0]
+    pos=sys.argv[1]
+    run(chr,pos)

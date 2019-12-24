@@ -53,6 +53,13 @@ def var_anno():
     name,anno=core.var_anno.run(chr,pos,ref,alt)
     return render_template('var_anno.html',Chr=chr,Pos=pos,Ref=ref,Alt=alt,Name=name,Anno=anno)
 
+@app.route('/site_retrieval',methods=['POST'])
+def site_retrieval():
+    chr = request.form['Chr']
+    pos = request.form['Pos']
+    gene,trans,details,chain,sequence=core.site_retrieval.run(chr,pos)
+    return render_template('site_retrieval.html',gene=gene,trans=trans,detail=details,chain=chain,sequence=sequence)
+
 if __name__ == '__main__':
-    #app.run(debug=True,host='192.168.1.120',port=100)
-    app.run(debug=True)
+    app.run(debug=True,host='192.168.1.120',port=100)
+    #app.run(debug=True)
