@@ -3,7 +3,9 @@
 <table class="table">
         <thead>
             <tr>
-                <th scope="col">gene name</th>
+                <th scope="col">chr</th>
+                <th scope="col">pos</th>
+                <th scope="col">gene_name</th>
                 <th scope="col">transcript_name</th>
                 <th scope="col">details</th>
                 <th scope="col">chain</th>
@@ -11,20 +13,27 @@
             </tr>
         </thead>
         <tbody>
-        {% set a=gene.split("\t") %}
-        {% set b=trans.split("\t") %}
-        {% set c=details.split("\t") %}
-        {% set d=chain.split("\t") %}
-        {% set seq=sequence %}
-            {% for i in range(len(a)) %}
+        {%for i in range(trans|length)%}
                 <tr>
-                    <td>{{a[i]}}</td>
-                    <td>{{b[i]}}</td>
-                    <td>{{c[i]}}</td>
-                    <td>{{d[i]}}</td>
-                    <td>{{seq}}</td>
+                    <td>{{chr}}</td>
+                    <td>{{pos}}</td>
+                    <td>{{gene[i]}}</td>
+                    <td>{{trans[i]}}</td>
+                    <td>{{detail[i]}}</td>
+                    <td>{{chain[i]}}</td>
+                    <td>{{sequence}}</td>
                 </tr>
-            {%- endfor %}
+        {%else%}
+        <tr>
+                    <td>{{chr}}</td>
+                    <td>{{pos}}</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td>{{sequence}}</td>
+                </tr>
+        {% endfor %}
         </tbody>
     </table>
 {% endblock %}

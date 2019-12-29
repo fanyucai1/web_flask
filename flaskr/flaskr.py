@@ -57,8 +57,8 @@ def var_anno():
 def site_retrieval():
     chr = request.form['Chr']
     pos = request.form['Pos']
-    gene,trans,details,chain,sequence=core.site_retrieval.run(chr,pos)
-    return render_template('site_retrieval.html',gene=gene,trans=trans,detail=details,chain=chain,sequence=sequence)
+    chr,pos,gene,trans,details,chain,sequence=core.site_retrieval.run(chr,pos)
+    return render_template('site_retrieval.html',chr=chr,pos=pos,gene=gene,trans=trans,detail=details,chain=chain,sequence=sequence)
 
 if __name__ == '__main__':
     app.run(debug=True,host='192.168.1.120',port=100)

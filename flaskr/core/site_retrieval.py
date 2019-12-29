@@ -17,6 +17,7 @@ def run(chr,pos,configfile="/home/fanyucai/config/config.ini"):
     gtf=config.get('database','hg19_gtf')
     bedtools=config.get('software','bedtools2.28.0')
     hg19=config.get('database','hg19_ref')
+    gencode_gtf=config.get('database','gencode_gtf')
     ##################################
     result_gene,result_trans,result_detail,result_chain=[],[],[],[]
     infile=open(gtf,"r")
@@ -30,12 +31,20 @@ def run(chr,pos,configfile="/home/fanyucai/config/config.ini"):
             gene_name = p.findall(line)[0]
             p = re.compile(r'transcript_id \"(\S+)\"')
             transcript = p.findall(line)[0]
-            if chr==array[0] and array[2] == "transcript" and pos >= int(array[3]) and pos <= int(array[4]):
+            if chr==array[0] and array[2] == "transcript" and int(pos) >= int(array[3]) and int(pos) <= int(array[4]):
                 geneID.append(gene_name)
                 transcriptID.append(transcript)
     infile.close()
+    if len(geneID)==0:
+        infile=open(gencode_gtf,"r")
+        for line in infile:
+            line = line.strip()
+            if not line.startswith("#"):
+                array = line.split("\t")
+                if chr == array[0] and array[2] == "gene" and int(pos) >= int(array[3]) and int(pos) <= int(array[4]):
+                    result_gene.append(array[2])
+        infile.close()
     ###################################
-    gene_fina, transcript_fina, exon = "", "", ""
     infile = open(gtf, "r")
     for line in infile:
         line=line.strip()
@@ -49,26 +58,16 @@ def run(chr,pos,configfile="/home/fanyucai/config/config.ini"):
                 p = re.compile(r'exon_number \"(\S+)\";')
                 exon_number = p.findall(line)[0]
                 if transcript in transcriptID:
-                    if pos >= int(array[3]) and pos <= int(array[4]):
+                    if int(pos) >= int(array[3]) and int(pos) <= int(array[4]):
                         result_gene.append(gene_name)
                         result_trans.append(transcript)
                         result_detail.append("exon_number:%s"%(exon_number))
                         result_chain.append(array[6])
-                    if int(pos) > int(array[4]):
-                        exon = exon_number[0]
-                        gene_fina=gene_name
-                        transcript_fina=transcript
-                    if int(pos) < int(array[3]) and exon != "" and gene_fina==gene_name and transcript_fina==transcript:
-                        result_gene.append(gene_name)
-                        result_trans.append(transcript)
-                        result_detail.append("intron_number:%s" % (exon_number))
-                        result_chain.append(array[6])
-                        exon=""
     infile.close()
     ##############################
     tmp = open("%s.bed"%unique_filename, "w")
-    right=pos+20
-    left=pos-20-1#bed的文件是左闭右开
+    right=int(pos)+20
+    left=int(pos)-20-1#bed的文件是左闭右开
     tmp.write("%s\t%s\t%s\n"%(chr,left,right))
     tmp.close()
     cmd='%s getfasta -fi %s -bed %s.bed -fo %s.fasta && rm %s.bed'%(bedtools,hg19,unique_filename,unique_filename,unique_filename)
@@ -81,7 +80,7 @@ def run(chr,pos,configfile="/home/fanyucai/config/config.ini"):
             outstring=line[0:20].lower()+line[20:21].upper()+line[21:].lower()
     infile.close()
     subprocess.check_call('rm %s.fasta'%(unique_filename),shell=True)
-    return (result_gene,result_trans,result_detail,result_chain,outstring)
+    return chr,pos,result_gene,result_trans,result_detail,result_chain,outstring
 
 if __name__=="__main__":
     chr=sys.argv[0]
