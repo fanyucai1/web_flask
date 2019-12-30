@@ -18,6 +18,7 @@ def run(chr,pos,configfile="/home/fanyucai/config/config.ini"):
     bedtools=config.get('software','bedtools2.28.0')
     hg19=config.get('database','hg19_ref')
     gencode_gtf=config.get('database','gencode_gtf')
+
     ##################################
     result_gene,result_trans,result_detail,result_chain=[],[],[],[]
     infile=open(gtf,"r")
@@ -80,7 +81,25 @@ def run(chr,pos,configfile="/home/fanyucai/config/config.ini"):
             outstring=line[0:20].lower()+line[20:21].upper()+line[21:].lower()
     infile.close()
     subprocess.check_call('rm %s.fasta'%(unique_filename),shell=True)
-    return chr,pos,result_gene,result_trans,result_detail,result_chain,outstring
+    #####################################################
+    trans1 = config.get('database', 'Canonical_transcript_file')
+    trans2 = config.get('database', 'msk_transcript')
+    infile=open(trans2,"r")
+    canoical_trans=[]
+    for line in infile:
+        line=line.strip()
+        array=line.split("\t")
+        if array[0] in result_gene:
+            canoical_trans.append(array[1])
+    infile.close()
+    if len(canoical_trans)==0:
+        infile = open(trans1, "r")
+        for line in infile:
+            line = line.strip()
+            array = line.split("\t")
+            if array[0] in result_gene:
+                canoical_trans.append(array[1].split(".")[0])
+    return chr,pos,result_gene,result_trans,result_detail,result_chain,outstring,canoical_trans
 
 if __name__=="__main__":
     chr=sys.argv[0]

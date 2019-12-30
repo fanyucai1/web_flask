@@ -9,13 +9,6 @@ import subprocess
 from flask import Flask, request, session, g, redirect, url_for, abort, render_template,flash,jsonify,make_response
 from flask import redirect
 
-trans="knownCanonical.final.tsv"
-infile=open(trans,"r")
-dict={}
-for line in infile:
-    line=line.strip()
-    array=line.split("\t")
-    dict[array[0]]=line
 ###################创建了Flask类的实例
 app=Flask(__name__)
 ###################给静态文件生成 URL，使用特殊的 'static' 端点名，这个文件应该存储在文件系统上的 static/style.css
@@ -58,8 +51,17 @@ def var_anno():
 def site_retrieval():
     chr = request.form['Chr']
     pos = request.form['Pos']
-    chr,pos,gene,trans,details,chain,sequence=core.site_retrieval.run(chr,pos)
-    return render_template('site_retrieval.html',chr=chr,pos=pos,gene=gene,trans=trans,detail=details,chain=chain,sequence=sequence)
+    chr,pos,gene,trans,details,chain,sequence,canoical_trans=core.site_retrieval.run(chr,pos)
+    return render_template('site_retrieval.html',chr=chr,pos=pos,gene=gene,trans=trans,detail=details,chain=chain,sequence=sequence,canoical_trans=canoical_trans)
+
+@app.route('/hotspot',methods=['POST'])
+def hotsopt():
+    chr = request.form['Chr']
+    pos = request.form['Pos']
+    ref=request.form['Ref']
+    alt=request.form['Alt']
+    string=core.hotspot.run(chr,pos,ref,alt)
+    return render_template('hotspot.html',string=string)
 
 if __name__ == '__main__':
     app.run(debug=True,host='192.168.1.120',port=100)

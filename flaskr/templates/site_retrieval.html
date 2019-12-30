@@ -18,7 +18,11 @@
                     <td>{{chr}}</td>
                     <td>{{pos}}</td>
                     <td>{{gene[i]}}</td>
-                    <td>{{trans[i]}}</td>
+                    {% if trans[i] in canoical_trans%}
+                        <td bgcolor="#FF0000">{{trans[i]}}</td>
+                    {%else%}
+                        <td>{{trans[i]}}</td>
+                    {%endif%}
                     <td>{{detail[i]}}</td>
                     <td>{{chain[i]}}</td>
                     <td>{{sequence}}</td>

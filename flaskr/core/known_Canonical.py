@@ -8,8 +8,8 @@ class Myconf(configparser.ConfigParser):
 def run(gene_name,configfile="/home/fanyucai/config/config.ini"):
     config = Myconf()
     config.read(configfile)
-    trans1=config.get('database','Canonical_transcript_file')
-    trans2=config.get('database','msk_transcript')
+    trans1 = config.get('database', 'Canonical_transcript_file')
+    trans2 = config.get('database', 'msk_transcript')
     infile=open(trans1,"r")
     clinvar_trans,msk_trans="",""
     for line in infile:
