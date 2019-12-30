@@ -1,24 +1,18 @@
 {% extends 'base.html' %}
 {% block body %}
 {% if Genename %}
-    <dt>
-        <h3>{{Genename}} known Canonical as follows::</h3>
-    </dt>
     <table class="table">
         <thead>
             <tr>
-                <th scope="col">Transcript</th>
+                <th scope="col">Most frequence in clinvar</th>
+                <th scope="col">Defined in MSK</th>
             </tr>
         </thead>
         <tbody>
-        {% set entrys=trans.split("\t") %}
-            {% for entry in entrys %}
-                {% if entry != Genename %}
-                    <tr>
-                        <td>{{entry}}</td>
-                    </tr>
-                {% endif %}
-            {% endfor %}
+            <tr>
+                <td>{{clinvar}}</td>
+                <td>{{msk}}</td>
+            </tr>
         </tbody>
     </table>
 {% endif %}

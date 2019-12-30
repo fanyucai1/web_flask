@@ -35,7 +35,8 @@ def home():
 def knownCanonical():
     if request.method == 'POST' and request.form['Genename']!="":
         gene =request.form['Genename']
-        return render_template('knownCanonical.html',Genename=gene,trans=dict[gene])
+        clinvar,msk=core.known_Canonical.run(gene)
+        return render_template('knownCanonical.html',Genename=gene,clinvar=clinvar,msk=msk)
 
 @app.route('/hgvs', methods=['POST'])
 def hgvs():
